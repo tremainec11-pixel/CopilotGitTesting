@@ -1,0 +1,118 @@
+// EventCard.jsx
+import React from "react";
+
+const EventCard = ({ event }) => {
+  if (!event) return <p>Invalid event data</p>;
+
+  const { title = "Untitled Event", date, location = "TBD" } = event;
+
+  return (
+    <div className="event-card">
+      <h3>{title}</h3>
+      <p>{date ? new Date(date).toLocaleDateString() : "Date not set"}</p>
+      <p>{location}</p>
+      <button>RSVP</button>
+    </div>
+  );
+};
+
+export default EventCard;
+
+const safeEvent = {
+  title: event.title || "Untitled Event",
+  date: event.date ? new Date(event.date) : new Date(),
+  location: event.location || "TBD"
+};
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NotFound from "./NotFound";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/events" element={<Events />} />
+        {/* Catch-all */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+import { FixedSizeList as List } from 'react-window';
+
+const EventList = ({ events }) => (
+  <List
+    height={600}
+    itemCount={events.length}
+    itemSize={50}
+    width={800}
+  >
+    {({ index, style }) => (
+      <div style={style}>{events[index].title}</div>
+    )}
+  </List>
+);
+
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-registration',
+  templateUrl: './registration.component.html',
+  styleUrls: ['./registration.component.css']
+})
+export class RegistrationComponent {
+  constructor(private fb: FormBuilder) {}
+
+  registrationForm = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', Validators.required]
+  });
+
+  get f() {
+    return this.registrationForm.controls;
+  }
+
+  onSubmit() {
+    if (this.registrationForm.valid) {
+      console.log('Form Submitted:', this.registrationForm.value);
+    }
+  }
+}
+
+// SessionContext.js
+import React, { createContext, useReducer, useContext } from "react";
+
+const SessionContext = createContext();
+
+const initialState = {
+  isAuthenticated: false,
+  user: null,
+  token: null,
+};
+
+function sessionReducer(state, action) {
+  switch (action.type) {
+    case "LOGIN":
+      return { isAuthenticated: true, user: action.payload.user, token: action.payload.token };
+    case "LOGOUT":
+      return { isAuthenticated: false, user: null, token: null };
+    default:
+      return state;
+  }
+}
+
+export const SessionProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(sessionReducer, initialState);
+
+  return (
+    <SessionContext.Provider value={{ state, dispatch }}>
+      {children}
+    </SessionContext.Provider>
+  );
+};
+
+export const useSession = () => useContext(SessionContext);
